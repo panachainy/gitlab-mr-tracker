@@ -12,10 +12,10 @@ This is a single-page web application for tracking GitLab merge requests in real
 - **Storage**: Browser localStorage
 
 ## Development Setup
-- **Install**: `npm install`
-- **Dev Server**: `npm run dev` (starts at http://localhost:5173)
-- **Build**: `npm run build` (outputs to dist/)
-- **Lint**: `npm run lint`
+- **Install**: `bun install`
+- **Dev Server**: `bun run dev` (starts at http://localhost:5173)
+- **Build**: `bun run build` (outputs to dist/)
+- **Lint**: `bun run lint`
 - No automated tests configured; coverage reports in coverage/ directory
 
 ## Architecture

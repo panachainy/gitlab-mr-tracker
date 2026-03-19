@@ -20,18 +20,18 @@ A single-page web application for tracking the latest status of GitLab merge req
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Bun
 
 ### Installation
 
 1. Install dependencies:
 ```bash
-npm install
+bun install
 ```
 
 2. Start the development server:
 ```bash
-npm run dev
+bun run dev
 ```
 
 3. Open your browser and navigate to the URL shown in the terminal (usually `http://localhost:5173`)
@@ -39,7 +39,7 @@ npm run dev
 ### Building for Production
 
 ```bash
-npm run build
+bun run build
 ```
 
 The built files will be in the `dist` directory, ready to be deployed to any static hosting service.
