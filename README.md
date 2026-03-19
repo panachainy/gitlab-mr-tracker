@@ -1,5 +1,7 @@
 # GitLab Merge Request Tracker
 
+move to use https://github.com/on-the-everything/gitlab-mr-tracker repository instead.
+
 [website](https://gitlab-mr-tracker.pages.dev)
 
 A single-page web application for tracking the latest status of GitLab merge requests. Built with React.js, TypeScript, and Tailwind CSS.
