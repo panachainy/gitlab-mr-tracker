@@ -11,11 +11,15 @@ interface ConfigModalProps {
 export function ConfigModal({ isOpen, onClose, config, onSave }: ConfigModalProps) {
   const [formData, setFormData] = useState<AppConfig>(config);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [viewMode, setViewMode] = useState<'form' | 'json'>('form');
+  const [jsonText, setJsonText] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
       setFormData(config);
       setErrors({});
+      setJsonText(JSON.stringify(config, null, 2));
+      setViewMode('form');
     }
   }, [isOpen, config]);
 
@@ -63,10 +67,15 @@ export function ConfigModal({ isOpen, onClose, config, onSave }: ConfigModalProp
     }
   };
 
-  const handleCancel = () => {
-    setFormData(config);
-    setErrors({});
-    onClose();
+  const handleJsonChange = (value: string) => {
+    setJsonText(value);
+    try {
+      const parsed = JSON.parse(value) as AppConfig;
+      setFormData(parsed);
+      setErrors({});
+    } catch (error) {
+      setErrors({ json: 'Invalid JSON format' });
+    }
   };
 
   const handleExport = () => {
@@ -143,7 +152,32 @@ export function ConfigModal({ isOpen, onClose, config, onSave }: ConfigModalProp
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex border-b mb-4">
+            <button
+              type="button"
+              onClick={() => setViewMode('form')}
+              className={`px-4 py-2 font-medium text-sm ${
+                viewMode === 'form'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Form
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('json')}
+              className={`px-4 py-2 font-medium text-sm ${
+                viewMode === 'json'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              JSON
+            </button>
+          </div>
+
+          {viewMode === 'form' && <div className="space-y-4">
             <div>
               <label htmlFor="gitlabHost" className="block text-sm font-medium text-gray-700 mb-1">
                 GitLab Host
@@ -369,41 +403,72 @@ export function ConfigModal({ isOpen, onClose, config, onSave }: ConfigModalProp
               </p>
             </div>
 
-            <div className="border-t pt-4 mt-4">
-              <div className="flex gap-2 mb-4">
-                <button
-                  type="button"
-                  onClick={handleExport}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                >
-                  📥 Export Config
-                </button>
-                <button
-                  type="button"
-                  onClick={handleImport}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                >
-                  📤 Import Config
-                </button>
-              </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
+          </div>
+
+
+          {viewMode === 'json' && <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  JSON Configuration
+                </label>
+                <textarea
+                  value={jsonText}
+                  onChange={(e) => handleJsonChange(e.target.value)}
+                  rows={20}
+                  className={`w-full px-3 py-2 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.json ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Paste your JSON configuration here"
+                />
+                {errors.json && (
+                  <p className="mt-1 text-sm text-red-600">{errors.json}</p>
+                )}
+              </div>
+            </div>
+            </div>
+
+          <div className="border-t pt-4 mt-4">
+            <div className="flex gap-2 mb-4">
               <button
                 type="button"
-                onClick={handleCancel}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={handleExport}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
               >
-                Cancel
+                📥 Export Config
               </button>
               <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                type="button"
+                onClick={handleImport}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
               >
-                Save
+                📤 Import Config
               </button>
             </div>
-          </form>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (viewMode === 'json' && errors.json) return;
+                if (viewMode === 'form' && !validate()) return;
+                onSave(formData);
+                onClose();
+              }}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Save
+            </button>
+          </div>
         </div>
       </div>
     </div>
